@@ -118,6 +118,10 @@ impl CPU {
                     }
                     _ => {
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::ADD(target)
+                        )
                     }
                 }
             }
@@ -126,6 +130,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::ADDHL(target)
+                        )
                     }
                 }
             }
@@ -134,6 +142,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::ADDC(target)
+                        )
                     }
                 }
             }
@@ -142,6 +154,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::SUB(target)
+                        )
                     }
                 }
             }
@@ -150,6 +166,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::SBC(target)
+                        )
                     }
                 }
             }
@@ -158,6 +178,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::AND(target)
+                        )
                     }
                 }
             }
@@ -166,6 +190,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::OR(target)
+                        )
                     }
                 }
             }
@@ -174,6 +202,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::XOR(target)
+                        )
                     }
                 }
             }
@@ -182,6 +214,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::CP(target)
+                        )
                     }
                 }
             }
@@ -190,6 +226,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::INC(target)
+                        )
                     }
                 }
             }
@@ -198,35 +238,71 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::DEC(target)
+                        )
                     }
                 }
             }
             Instruction::CCF() => {
                 //TODO: Implement instruction
+                panic!(
+                    "Unregistered Instruction detected!\n{:?}",
+                    Instruction::CCF()
+                )
             }
             Instruction::SCF() => {
                 //TODO: Implement instruction
+                panic!(
+                    "Unregistered Instruction detected!\n{:?}",
+                    Instruction::SCF()
+                )
             }
             Instruction::RRA() => {
                 //TODO: Implement instruction
+                panic!(
+                    "Unregistered Instruction detected!\n{:?}",
+                    Instruction::RRA()
+                )
             }
             Instruction::RLA() => {
                 //TODO: Implement instruction
+                panic!(
+                    "Unregistered Instruction detected!\n{:?}",
+                    Instruction::RLA()
+                )
             }
             Instruction::RRCA() => {
                 //TODO: Implement instruction
+                panic!(
+                    "Unregistered Instruction detected!\n{:?}",
+                    Instruction::RRCA()
+                )
             }
             Instruction::RRLA() => {
                 //TODO: Implement instruction
+                panic!(
+                    "Unregistered Instruction detected!\n{:?}",
+                    Instruction::RRLA()
+                )
             }
             Instruction::CPL() => {
                 //TODO: Implement instruction
+                panic!(
+                    "Unregistered Instruction detected!\n{:?}",
+                    Instruction::CPL()
+                )
             }
             Instruction::BIT(target) => {
                 match target {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::BIT(target)
+                        )
                     }
                 }
             }
@@ -235,6 +311,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::RESET(target)
+                        )
                     }
                 }
             }
@@ -243,6 +323,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::SET(target)
+                        )
                     }
                 }
             }
@@ -251,6 +335,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::SRL(target)
+                        )
                     }
                 }
             }
@@ -259,6 +347,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::RR(target)
+                        )
                     }
                 }
             }
@@ -267,6 +359,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::RL(target)
+                        )
                     }
                 }
             }
@@ -275,6 +371,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::RRC(target)
+                        )
                     }
                 }
             }
@@ -283,6 +383,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::RLC(target)
+                        )
                     }
                 }
             }
@@ -291,6 +395,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::SRA(target)
+                        )
                     }
                 }
             }
@@ -299,6 +407,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::SLA(target)
+                        )
                     }
                 }
             }
@@ -307,6 +419,10 @@ impl CPU {
                     _ => {
                         //TODO: Implement instruction
                         //TODO: Add more targets
+                        panic!(
+                            "Unregistered Instruction detected!\n{:?}",
+                            Instruction::SWAP(target)
+                        )
                     }
                 }
             }
