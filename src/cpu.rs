@@ -3,10 +3,40 @@ const SUBTRACT_FLAG_BYTE_POSITION: u8 = 6;
 const HALF_CARRY_FLAG_BYTE_POSITION: u8 = 5;
 const CARRY_FLAG_BYTE_POSITION: u8 = 4;
 
+#[derive(Debug)]
 enum Instruction {
     ADD(ArithmeticTarget),
+    ADDHL(ArithmeticTarget),
+    ADDC(ArithmeticTarget),
+    SUB(ArithmeticTarget),
+    SBC(ArithmeticTarget),
+    AND(ArithmeticTarget),
+    OR(ArithmeticTarget),
+    XOR(ArithmeticTarget),
+    CP(ArithmeticTarget),
+    INC(ArithmeticTarget),
+    DEC(ArithmeticTarget),
+    CCF(),
+    SCF(),
+    RRA(),
+    RLA(),
+    RRCA(),
+    RRLA(),
+    CPL(),
+    BIT(ArithmeticTarget),
+    RESET(ArithmeticTarget),
+    SET(ArithmeticTarget),
+    SRL(ArithmeticTarget),
+    RR(ArithmeticTarget),
+    RL(ArithmeticTarget),
+    RRC(ArithmeticTarget),
+    RLC(ArithmeticTarget),
+    SRA(ArithmeticTarget),
+    SLA(ArithmeticTarget),
+    SWAP(ArithmeticTarget),
 }
 
+#[derive(Debug)]
 enum ArithmeticTarget {
     A,
     B,
@@ -91,8 +121,198 @@ impl CPU {
                     }
                 }
             }
+            Instruction::ADDHL(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::ADDC(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::SUB(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::SBC(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::AND(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::OR(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::XOR(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::CP(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::INC(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::DEC(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::CCF() => {
+                //TODO: Implement instruction
+            }
+            Instruction::SCF() => {
+                //TODO: Implement instruction
+            }
+            Instruction::RRA() => {
+                //TODO: Implement instruction
+            }
+            Instruction::RLA() => {
+                //TODO: Implement instruction
+            }
+            Instruction::RRCA() => {
+                //TODO: Implement instruction
+            }
+            Instruction::RRLA() => {
+                //TODO: Implement instruction
+            }
+            Instruction::CPL() => {
+                //TODO: Implement instruction
+            }
+            Instruction::BIT(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::RESET(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::SET(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::SRL(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::RR(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::RL(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::RRC(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::RLC(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::SRA(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::SLA(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+            Instruction::SWAP(target) => {
+                match target {
+                    _ => {
+                        //TODO: Implement instruction
+                        //TODO: Add more targets
+                    }
+                }
+            }
+
             _ => {
-                //TODO: Add more instructions
+                panic!("Unregistered Instruction detected!\n{:?}", instruction)
             }
         }
     }
