@@ -8,6 +8,9 @@ const SUBTRACT_FLAG_BYTE_POSITION: u8 = 6;
 const HALF_CARRY_FLAG_BYTE_POSITION: u8 = 5;
 const CARRY_FLAG_BYTE_POSITION: u8 = 4;
 
+const SANITIZE_MOST_SIGNIFICANT_BYTE: u16 = 0xFF00;
+const SANITIZE_LESS_SIGNIFICANT_BYTE: u16 = 0xFF;
+
 #[derive(Debug)]
 enum Instruction {
     ADD(ArithmeticTarget),
@@ -40,6 +43,7 @@ enum Instruction {
     SLA(ArithmeticTarget),
     SWAP(ArithmeticTarget),
     JP(JumpTest),
+    LD(LoadType),
 }
 
 #[derive(Debug)]
@@ -89,6 +93,36 @@ enum PrefixTarget {
     A,
 }
 
+#[derive(Debug)]
+enum LoadByteTarget {
+    A,
+    B,
+    C,
+    D,
+    E,
+    H,
+    L,
+    HLI,
+}
+
+#[derive(Debug)]
+enum LoadByteSource {
+    A,
+    B,
+    C,
+    D,
+    E,
+    H,
+    L,
+    D8,
+    HLI,
+}
+
+#[derive(Debug)]
+enum LoadType {
+    Byte(LoadByteTarget, LoadByteSource),
+}
+
 struct Registers {
     a: u8,
     b: u8,
@@ -122,9 +156,13 @@ impl Registers {
         (self.b as u16) << 8 | self.c as u16
     }
 
+    fn get_hl(&self) -> u16 {
+        (self.h as u16) << 8 | self.l as u16
+    }
+
     fn set_bc(&mut self, value: u16) {
-        self.b = ((value & 0xFF00) >> 8) as u8;
-        self.c = (value & 0xFF) as u8
+        self.b = ((value & SANITIZE_MOST_SIGNIFICANT_BYTE) >> 8) as u8;
+        self.c = (value & SANITIZE_LESS_SIGNIFICANT_BYTE) as u8
     }
 }
 
@@ -157,6 +195,17 @@ impl std::convert::From<u8> for FlagsRegister {
 impl MemoryBus {
     fn read_byte(&self, address: u16) -> u8 {
         self.memory[address as usize]
+    }
+
+    fn read_next_byte(&self, pc: &mut u16) -> u8 {
+        let byte = self.read_byte(*pc + 1);
+        *pc += 1;
+
+        byte
+    }
+
+    fn write_byte(&mut self, address: u16, byte: u8) {
+        self.memory[address as usize] = byte;
     }
 }
 
@@ -528,6 +577,34 @@ impl CPU {
 
                 self.jump(jump_condition)
             }
+            Instruction::LD(load_type) => match load_type {
+                LoadType::Byte(target, source) => {
+                    let source_value = match source {
+                        LoadByteSource::A => self.registers.a,
+                        LoadByteSource::D8 => self.bus.read_next_byte(&mut self.pc),
+                        LoadByteSource::HLI => self.bus.read_byte(self.registers.get_hl()),
+                        _ => {
+                            panic!("TODO: implement other sources")
+                        }
+                    };
+                    match target {
+                        LoadByteTarget::A => self.registers.a = source_value,
+                        LoadByteTarget::HLI => {
+                            self.bus.write_byte(self.registers.get_hl(), source_value)
+                        }
+                        _ => {
+                            panic!("TODO: implement other targets")
+                        }
+                    };
+                    match source {
+                        LoadByteSource::D8 => self.pc.wrapping_add(2),
+                        _ => self.pc.wrapping_add(1),
+                    }
+                }
+                _ => {
+                    panic!("TODO: implement other load types")
+                }
+            },
             _ => {
                 panic!("Unregistered Instruction detected!\n{:?}", instruction)
             }
