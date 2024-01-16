@@ -1,3 +1,8 @@
+/**
+ * The file is named as "cpu" but are a Singleton,
+ * should be splitted latter.
+ */
+
 const ZERO_FLAG_BYTE_POSITION: u8 = 7;
 const SUBTRACT_FLAG_BYTE_POSITION: u8 = 6;
 const HALF_CARRY_FLAG_BYTE_POSITION: u8 = 5;
@@ -14,8 +19,8 @@ enum Instruction {
     OR(ArithmeticTarget),
     XOR(ArithmeticTarget),
     CP(ArithmeticTarget),
-    INC(ArithmeticTarget),
-    DEC(ArithmeticTarget),
+    INC(IncDecTarget),
+    DEC(IncDecTarget),
     CCF(),
     SCF(),
     RRA(),
@@ -30,10 +35,35 @@ enum Instruction {
     RR(ArithmeticTarget),
     RL(ArithmeticTarget),
     RRC(ArithmeticTarget),
-    RLC(ArithmeticTarget),
+    RLC(PrefixTarget),
     SRA(ArithmeticTarget),
     SLA(ArithmeticTarget),
     SWAP(ArithmeticTarget),
+    JP(JumpTest),
+}
+
+#[derive(Debug)]
+enum JumpTest {
+    NotZero,
+    Zero,
+    NotCarry,
+    Carry,
+    Always,
+}
+
+#[derive(Debug)]
+enum IncDecTarget {
+    B,
+    C,
+    D,
+    E,
+    H,
+    L,
+    A,
+    BC,
+    DE,
+    HL,
+    SP,
 }
 
 #[derive(Debug)]
@@ -45,6 +75,18 @@ enum ArithmeticTarget {
     E,
     H,
     L,
+}
+
+#[derive(Debug)]
+enum PrefixTarget {
+    B,
+    C,
+    D,
+    E,
+    H,
+    L,
+    HL,
+    A,
 }
 
 struct Registers {
@@ -63,6 +105,16 @@ struct FlagsRegister {
     subtract: bool,
     half_carry: bool,
     carry: bool,
+}
+
+struct CPU {
+    registers: Registers,
+    pc: u16,
+    bus: MemoryBus,
+}
+
+struct MemoryBus {
+    memory: [u8; 0xFFFF],
 }
 
 impl Registers {
@@ -102,12 +154,14 @@ impl std::convert::From<u8> for FlagsRegister {
     }
 }
 
-struct CPU {
-    registers: Registers,
+impl MemoryBus {
+    fn read_byte(&self, address: u16) -> u8 {
+        self.memory[address as usize]
+    }
 }
 
 impl CPU {
-    fn execute(&mut self, instruction: Instruction) {
+    fn execute(&mut self, instruction: Instruction) -> u16 {
         /*
         See:
         - https://gekkio.fi/files/gb-docs/gbctr.pdf
@@ -151,6 +205,7 @@ impl CPU {
                         let current_value = self.registers.c;
                         let new_value = self.add(current_value);
                         self.registers.a = new_value;
+                        self.pc.wrapping_add(1)
                     }
                     _ => {
                         //TODO: Add more targets
@@ -462,13 +517,24 @@ impl CPU {
                     }
                 }
             }
+            Instruction::JP(test) => {
+                let jump_condition = match test {
+                    JumpTest::NotZero => !self.registers.f.zero,
+                    JumpTest::NotCarry => !self.registers.f.carry,
+                    JumpTest::Zero => self.registers.f.zero,
+                    JumpTest::Carry => self.registers.f.carry,
+                    JumpTest::Always => true,
+                };
 
+                self.jump(jump_condition)
+            }
             _ => {
                 panic!("Unregistered Instruction detected!\n{:?}", instruction)
             }
         }
     }
 
+    /* OPC-ADD */
     fn add(&mut self, value: u8) -> u8 {
         let (new_value, did_overflow) = self.registers.a.overflowing_add(value);
 
@@ -487,5 +553,104 @@ impl CPU {
         self.registers.f.half_carry = (self.registers.a & 0xF) + (value & 0xF) > 0xF;
 
         new_value
+    }
+
+    /* OPC-JP */
+    fn jump(&self, should_jump: bool) -> u16 {
+        if should_jump {
+            //INFO: Gameboy is a little-endian device!
+            /*
+                For hex 0x00002010:                  (most significant)             (less significant)
+                Little-endian (less sig first):      |      0x10,     | 0x20, 0x00, |      0x00      |
+                Big-endian (most sig first):         |      0x00,     | 0x00, 0x20, |      0x10      |
+            */
+            let least_significant_byte = self.bus.read_byte(self.pc + 1) as u16;
+            let most_significant_byte = self.bus.read_byte(self.pc + 2) as u16;
+
+            (most_significant_byte << 8) | least_significant_byte
+        } else {
+            self.pc.wrapping_add(3)
+        }
+    }
+
+    fn step(&mut self) {
+        let mut instruction_byte = self.bus.read_byte(self.pc);
+        let prefixed = instruction_byte == 0xCB;
+
+        if prefixed {
+            instruction_byte = self.bus.read_byte(self.pc + 1);
+        }
+
+        let next_pc = if let Some(instruction) = Instruction::from_byte(instruction_byte, prefixed)
+        {
+            self.execute(instruction)
+        } else {
+            let description = format!(
+                "0x{}{:x}",
+                if prefixed { "cb" } else { "" },
+                instruction_byte
+            );
+
+            panic!("Unkown instruction found for: {}", description)
+        };
+
+        self.pc = next_pc;
+    }
+}
+
+impl Instruction {
+    fn from_byte(byte: u8, prefixed: bool) -> Option<Instruction> {
+        if prefixed {
+            Instruction::from_byte_prefixed(byte)
+        } else {
+            Instruction::from_not_prefixed(byte)
+        }
+    }
+
+    fn from_byte_prefixed(byte: u8) -> Option<Instruction> {
+        match byte {
+            /* RLC Opc */
+            0x00 => Some(Instruction::RLC(PrefixTarget::B)),
+
+            /* Fallback */
+            _ => panic!("Prefixed 0x{:?} not implemented!", byte),
+        }
+    }
+
+    fn from_not_prefixed(byte: u8) -> Option<Instruction> {
+        // TODO: Search differences between 0x34 / 0x23
+        // TODO: Search differences between 0x2B / 0x35
+        match byte {
+            /* INC Opc */
+            0x03 => Some(Instruction::INC(IncDecTarget::BC)),
+            0x04 => Some(Instruction::INC(IncDecTarget::B)),
+            0x0C => Some(Instruction::INC(IncDecTarget::C)),
+            0x13 => Some(Instruction::INC(IncDecTarget::DE)),
+            0x14 => Some(Instruction::INC(IncDecTarget::D)),
+            0x1C => Some(Instruction::INC(IncDecTarget::E)),
+            // 0x23 => Some(Instruction::INC(IncDecTarget::HL)),
+            0x24 => Some(Instruction::INC(IncDecTarget::H)),
+            0x2C => Some(Instruction::INC(IncDecTarget::L)),
+            0x33 => Some(Instruction::INC(IncDecTarget::SP)),
+            // 0x34 => Some(Instruction::INC(IncDecTarget::HL)),
+            0x3C => Some(Instruction::INC(IncDecTarget::A)),
+
+            /* DEC Operations */
+            0x05 => Some(Instruction::DEC(IncDecTarget::B)),
+            0x0B => Some(Instruction::DEC(IncDecTarget::BC)),
+            0x0D => Some(Instruction::DEC(IncDecTarget::C)),
+            0x15 => Some(Instruction::DEC(IncDecTarget::D)),
+            0x1B => Some(Instruction::DEC(IncDecTarget::DE)),
+            0x1D => Some(Instruction::DEC(IncDecTarget::E)),
+            0x25 => Some(Instruction::DEC(IncDecTarget::H)),
+            // 0x2B => Some(Instruction::DEC(IncDecTarget::HL)),
+            0x2D => Some(Instruction::DEC(IncDecTarget::L)),
+            // 0x35 => Some(Instruction::DEC(IncDecTarget::HL)),
+            0x3B => Some(Instruction::DEC(IncDecTarget::SP)),
+            0x3D => Some(Instruction::DEC(IncDecTarget::A)),
+
+            /* Fallback */
+            _ => panic!("Non-prefixed 0x{:?} not implemented!", byte),
+        }
     }
 }
