@@ -387,7 +387,7 @@ impl CartridgeHeader {
         }
     }
 
-    pub fn init(rom_buffer: Vec<u8>, metadata: fs::Metadata) -> CartridgeHeader {
+    pub fn init(rom_buffer: Vec<u8>) -> CartridgeHeader {
         let mut cartridge_header = CartridgeHeader {
             cartridge_size: 0,
             lic_code: 0,

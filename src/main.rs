@@ -5,7 +5,6 @@ mod cpu;
 use std::{
     fs::{self, File},
     io::Read,
-    os::unix::fs::MetadataExt,
 };
 
 use cpu::{FlagsRegister, MemoryBus, Registers, CPU};
@@ -20,7 +19,7 @@ fn main() {
     let mut buffer: Vec<u8> = vec![0; metadata.len() as usize];
     file.read(&mut buffer).expect("Buffer overflow");
 
-    let cartridge_header: CartridgeHeader = CartridgeHeader::init(buffer, metadata);
+    let cartridge_header: CartridgeHeader = CartridgeHeader::init(buffer);
 
     println!("{:?}", cartridge_header);
 }
